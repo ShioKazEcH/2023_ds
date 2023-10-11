@@ -43,8 +43,7 @@
     
     <script>
         const gameBoard = document.getElementById('game-board');
-        let currentBlock = createBlock();
-        let blockPosition = { x: 0, y: 0 };
+        let currentBlock;
 
         function createBlock() {
             const block = document.createElement('div');
@@ -53,7 +52,7 @@
             block.style.height = '30px';
             block.style.position = 'absolute';
             block.style.backgroundColor = getRandomColor();
-            blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
+            const blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
             block.style.left = blockPosition.x + 'px';
             block.style.top = blockPosition.y + 'px';
             gameBoard.appendChild(block);
@@ -70,6 +69,9 @@
         }
 
         function moveBlockDown() {
+            if (!currentBlock) return;
+
+            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
             blockPosition.y += 30;
             currentBlock.style.top = blockPosition.y + 'px';
             if (blockPosition.y >= 570) {
@@ -79,6 +81,9 @@
         }
 
         function moveBlockLeft() {
+            if (!currentBlock) return;
+
+            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
             if (blockPosition.x > 0) {
                 blockPosition.x -= 30;
                 currentBlock.style.left = blockPosition.x + 'px';
@@ -86,11 +91,19 @@
         }
 
         function moveBlockRight() {
+            if (!currentBlock) return;
+
+            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
             if (blockPosition.x < 270) {
                 blockPosition.x += 30;
                 currentBlock.style.left = blockPosition.x + 'px';
             }
         }
+
+        // ページ読み込み時に初期ブロックを生成
+        window.onload = function() {
+            currentBlock = createBlock();
+        };
     </script>
 </body>
 </html>
