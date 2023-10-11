@@ -12,7 +12,6 @@
         .block {
             width: 30px;
             height: 30px;
-            background: #666;
             position: absolute;
         }
 
@@ -44,24 +43,53 @@
     
     <script>
         const gameBoard = document.getElementById('game-board');
-        const block = document.createElement('div');
-        block.classList.add('block');
-        gameBoard.appendChild(block);
+        let currentBlock = createBlock();
         let blockPosition = { x: 0, y: 0 };
+
+        function createBlock() {
+            const block = document.createElement('div');
+            block.classList.add('block');
+            block.style.width = '30px';
+            block.style.height = '30px';
+            block.style.position = 'absolute';
+            block.style.backgroundColor = getRandomColor();
+            blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
+            block.style.left = blockPosition.x + 'px';
+            block.style.top = blockPosition.y + 'px';
+            gameBoard.appendChild(block);
+            return block;
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
 
         function moveBlockDown() {
             blockPosition.y += 30;
-            block.style.top = blockPosition.y + 'px';
+            currentBlock.style.top = blockPosition.y + 'px';
+            if (blockPosition.y >= 570) {
+                gameBoard.removeChild(currentBlock);
+                currentBlock = createBlock();
+            }
         }
 
         function moveBlockLeft() {
-            blockPosition.x -= 30;
-            block.style.left = blockPosition.x + 'px';
+            if (blockPosition.x > 0) {
+                blockPosition.x -= 30;
+                currentBlock.style.left = blockPosition.x + 'px';
+            }
         }
 
         function moveBlockRight() {
-            blockPosition.x += 30;
-            block.style.left = blockPosition.x + 'px';
+            if (blockPosition.x < 270) {
+                blockPosition.x += 30;
+                currentBlock.style.left = blockPosition.x + 'px';
+            }
         }
     </script>
 </body>
