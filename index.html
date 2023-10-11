@@ -2,60 +2,55 @@
 <html>
 <head>
     <style>
-        #game-container {
-            width: 600px;
-            height: 150px;
+        #game-board {
+            width: 300px;
+            height: 600px;
             background: #f7f7f7;
             position: relative;
         }
 
-        #dinosaur {
-            width: 50px;
-            height: 50px;
+        .tetrimino {
+            width: 30px;
+            height: 30px;
             background: #666;
             position: absolute;
-            bottom: 0;
-            left: 0;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="dinosaur"></div>
-    </div>
+    <div id="game-board"></div>
     
     <script>
-        const dinosaur = document.getElementById('dinosaur');
-        let jumping = false;
+        const gameBoard = document.getElementById('game-board');
+        const tetrimino = document.createElement('div');
+        tetrimino.classList.add('tetrimino');
+        gameBoard.appendChild(tetrimino);
+        let tetriminoPosition = { x: 0, y: 0 };
 
-        document.addEventListener('keydown', jump);
-
-        function jump(event) {
-            if (event.keyCode === 32 && !jumping) {
-                jumping = true;
-                let position = 0;
-
-                const jumpInterval = setInterval(() => {
-                    const gravity = 1.5;
-                    const jumpHeight = 60;
-
-                    if (position >= jumpHeight) {
-                        clearInterval(jumpInterval);
-                        const fallInterval = setInterval(() => {
-                            if (position <= 0) {
-                                clearInterval(fallInterval);
-                                jumping = false;
-                            }
-                            position -= gravity;
-                            dinosaur.style.bottom = position + 'px';
-                        }, 10);
-                    } else {
-                        position += gravity;
-                        dinosaur.style.bottom = position + 'px';
-                    }
-                }, 10);
-            }
+        function moveTetriminoDown() {
+            tetriminoPosition.y += 30;
+            tetrimino.style.top = tetriminoPosition.y + 'px';
         }
+
+        function moveTetriminoLeft() {
+            tetriminoPosition.x -= 30;
+            tetrimino.style.left = tetriminoPosition.x + 'px';
+        }
+
+        function moveTetriminoRight() {
+            tetriminoPosition.x += 30;
+            tetrimino.style.left = tetriminoPosition.x + 'px';
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                moveTetriminoDown();
+            } else if (event.key === 'ArrowLeft') {
+                moveTetriminoLeft();
+            } else if (event.key === 'ArrowRight') {
+                moveTetriminoRight();
+            }
+        });
     </script>
 </body>
 </html>
