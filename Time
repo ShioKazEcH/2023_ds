@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>世界の主要都市の現在時刻</title>
+</head>
+<body>
+    <h1>主要都市の現在時刻</h1>
+    <ul id="city-times">
+        <!-- ここに都市の現在時刻が表示されます -->
+    </ul>
+
+    <script>
+        // 都市と対応するタイムゾーンオフセット
+        const cities = [
+            { name: "ニューヨーク", offset: -5 },
+            { name: "ロンドン", offset: 0 },
+            { name: "東京", offset: 9 },
+            { name: "シドニー", offset: 11 },
+            // 追加の都市をここに追加できます
+        ];
+
+        // 現在時刻を取得して表示
+        function displayCurrentTime() {
+            const cityTimes = document.getElementById("city-times");
+            cityTimes.innerHTML = ""; // 既存の表示をクリア
+
+            const now = new Date();
+            for (const city of cities) {
+                const time = new Date(now.getTime() + city.offset * 60 * 60 * 1000);
+                const timeString = `${city.name}: ${time.toLocaleString()}`;
+                const li = document.createElement("li");
+                li.textContent = timeString;
+                cityTimes.appendChild(li);
+            }
+        }
+
+        // 1秒ごとに更新
+        setInterval(displayCurrentTime, 1000);
+        
+        // ページ読み込み時に初回表示
+        displayCurrentTime();
+    </script>
+</body>
+</html>
