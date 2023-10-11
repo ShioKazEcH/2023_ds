@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rainbow Text</title>
+    <style>
+      #text {
+        font-size: 24px;
+        transition: color 0.5s;
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="showRainbowText()">ƒ{ƒ^ƒ“‚ð‰Ÿ‚·</button>
+    <p id="text">Hello world</p>
+
+    <script>
+      function showRainbowText() {
+        var textElement = document.getElementById("text");
+        var colors = [
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "blue",
+          "indigo",
+          "violet"
+        ];
+        var currentColor = 0;
+
+        setInterval(function() {
+          textElement.style.color = colors[currentColor];
+          currentColor = (currentColor + 1) % colors.length;
+        }, 500);
+      }
+    </script>
+  </body>
+</html>
