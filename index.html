@@ -1,57 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>世界の銘菓オススメ</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
+    <style>
+        #game-container {
+            width: 600px;
+            height: 150px;
+            background: #f7f7f7;
+            position: relative;
+        }
 
-    h1 {
-      color: #333;
-    }
-
-    #recommendation {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      margin: 20px;
-      font-size: 24px;
-    }
-  </style>
+        #dinosaur {
+            width: 50px;
+            height: 50px;
+            background: #666;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
 </head>
 <body>
-  <h1>世界の銘菓をオススメします</h1>
-  <div id="recommendation"></div>
+    <div id="game-container">
+        <div id="dinosaur"></div>
+    </div>
+    
+    <script>
+        const dinosaur = document.getElementById('dinosaur');
+        let jumping = false;
 
-  <script>
-    // 世界の銘菓リスト
-    const worldFamousSweets = [
-      'ベルギーチョコレート',
-      'フランスのマカロン',
-      'イタリアのティラミス',
-      '日本の和菓子',
-      'トルコのバクラバ',
-      'スイスのスイスチョコレート',
-      'アメリカのアップルパイ',
-      'ギリシャのバクラバ',
-    ];
+        document.addEventListener('keydown', jump);
 
-    // ランダムに銘菓を選んで表示
-    function recommendSweet() {
-      const recommendationElement = document.getElementById('recommendation');
-      const randomIndex = Math.floor(Math.random() * worldFamousSweets.length);
-      const recommendedSweet = worldFamousSweets[randomIndex];
-      recommendationElement.textContent = `オススメの銘菓: ${recommendedSweet}`;
-    }
+        function jump(event) {
+            if (event.keyCode === 32 && !jumping) {
+                jumping = true;
+                let position = 0;
 
-    // ページ読み込み時に銘菓をオススメ
-    recommendSweet();
-  </script>
+                const jumpInterval = setInterval(() => {
+                    const gravity = 1.5;
+                    const jumpHeight = 60;
+
+                    if (position >= jumpHeight) {
+                        clearInterval(jumpInterval);
+                        const fallInterval = setInterval(() => {
+                            if (position <= 0) {
+                                clearInterval(fallInterval);
+                                jumping = false;
+                            }
+                            position -= gravity;
+                            dinosaur.style.bottom = position + 'px';
+                        }, 10);
+                    } else {
+                        position += gravity;
+                        dinosaur.style.bottom = position + 'px';
+                    }
+                }, 10);
+            }
+        }
+    </script>
 </body>
 </html>
