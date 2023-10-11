@@ -45,6 +45,7 @@
         const gameBoard = document.getElementById('game-board');
         let currentBlock;
         let interval;
+        let maxY = 0; // 最下部を保持
 
         function createBlock() {
             const block = document.createElement('div');
@@ -53,16 +54,7 @@
             block.style.height = '30px';
             block.style.position = 'absolute';
             block.style.backgroundColor = getRandomColor();
-            let blockPosition;
-            if (!currentBlock) {
-                blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
-            } else {
-                const currentBlockPosition = {
-                    x: parseInt(currentBlock.style.left),
-                    y: parseInt(currentBlock.style.top)
-                };
-                blockPosition = { x: currentBlockPosition.x, y: currentBlockPosition.y - 30 };
-            }
+            const blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
             block.style.left = blockPosition.x + 'px';
             block.style.top = blockPosition.y + 'px';
             gameBoard.appendChild(block);
@@ -84,9 +76,14 @@
             const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
             blockPosition.y += 30;
             currentBlock.style.top = blockPosition.y + 'px';
+            maxY = Math.max(maxY, blockPosition.y); // 最下部を更新
 
-            if (isBlockCollision(0, 30)) {
+            if (maxY >= 570 || isBlockCollision()) {
+                currentBlock = null;
+                maxY = 0; // 最下部をリセット
+                checkAndClearLines();
                 currentBlock = createBlock();
+                interval = setInterval(moveBlockDown, 500);
             }
         }
 
@@ -127,6 +124,24 @@
             return false;
         }
 
+        function checkAndClearLines() {
+            const allBlocks = document.querySelectorAll('.block');
+            for (let y = 570; y >= 0; y -= 30) {
+                const blocksInLine = Array.from(allBlocks).filter(block => parseInt(block.style.top) === y);
+                if (blocksInLine.length === 10) {
+                    for (const block of blocksInLine) {
+                        gameBoard.removeChild(block);
+                    }
+                    allBlocks.forEach(block => {
+                        if (parseInt(block.style.top) < y) {
+                            const newY = parseInt(block.style.top) + 30;
+                            block.style.top = newY + 'px';
+                        }
+                    });
+                }
+            }
+        }
+
         // ページ読み込み時に初期ブロックを生成
         window.onload = function() {
             currentBlock = createBlock();
@@ -135,3 +150,4 @@
     </script>
 </body>
 </html>
+
