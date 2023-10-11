@@ -9,48 +9,60 @@
             position: relative;
         }
 
-        .tetrimino {
+        .block {
             width: 30px;
             height: 30px;
             background: #666;
             position: absolute;
+        }
+
+        #button-container {
+            text-align: center;
+        }
+
+        .arrow-button {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #333;
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <div id="game-board"></div>
     
+    <div id="button-container">
+        <div class="arrow-button" id="left-button" onclick="moveBlockLeft()">&#9665;</div>
+        <div class="arrow-button" id="right-button" onclick="moveBlockRight()">&#9655;</div>
+        <div class="arrow-button" id="down-button" onclick="moveBlockDown()">&#9661;</div>
+    </div>
+    
     <script>
         const gameBoard = document.getElementById('game-board');
-        const tetrimino = document.createElement('div');
-        tetrimino.classList.add('tetrimino');
-        gameBoard.appendChild(tetrimino);
-        let tetriminoPosition = { x: 0, y: 0 };
+        const block = document.createElement('div');
+        block.classList.add('block');
+        gameBoard.appendChild(block);
+        let blockPosition = { x: 0, y: 0 };
 
-        function moveTetriminoDown() {
-            tetriminoPosition.y += 30;
-            tetrimino.style.top = tetriminoPosition.y + 'px';
+        function moveBlockDown() {
+            blockPosition.y += 30;
+            block.style.top = blockPosition.y + 'px';
         }
 
-        function moveTetriminoLeft() {
-            tetriminoPosition.x -= 30;
-            tetrimino.style.left = tetriminoPosition.x + 'px';
+        function moveBlockLeft() {
+            blockPosition.x -= 30;
+            block.style.left = blockPosition.x + 'px';
         }
 
-        function moveTetriminoRight() {
-            tetriminoPosition.x += 30;
-            tetrimino.style.left = tetriminoPosition.x + 'px';
+        function moveBlockRight() {
+            blockPosition.x += 30;
+            block.style.left = blockPosition.x + 'px';
         }
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowDown') {
-                moveTetriminoDown();
-            } else if (event.key === 'ArrowLeft') {
-                moveTetriminoLeft();
-            } else if (event.key === 'ArrowRight') {
-                moveTetriminoRight();
-            }
-        });
     </script>
 </body>
 </html>
