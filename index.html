@@ -2,152 +2,118 @@
 <html>
 <head>
     <style>
-        #game-board {
-            width: 300px;
-            height: 600px;
-            background: #f7f7f7;
+        body {
+            margin: 0;
+            overflow: hidden;
             position: relative;
         }
 
-        .block {
-            width: 30px;
-            height: 30px;
+        #sky {
+            background: #87CEEB;
+            width: 100%;
+            height: 100%;
             position: absolute;
+            top: 0;
+            left: 0;
         }
 
-        #button-container {
-            text-align: center;
+        #sun {
+            width: 100px;
+            height: 100px;
+            background: #FFD700;
+            border-radius: 50%;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            transition: transform 2s ease-in-out;
         }
 
-        .arrow-button {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            background: #333;
-            color: #fff;
-            font-size: 24px;
-            text-align: center;
-            cursor: pointer;
-            margin: 5px;
+        #cloud {
+            width: 200px;
+            height: 80px;
+            background: #ddd;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            transition: transform 4s ease-in-out;
+        }
+
+        #raindrop {
+            width: 2px;
+            height: 10px;
+            background: blue;
+            position: absolute;
+            animation: fall 2s linear infinite, sway 1s ease-in-out infinite;
+        }
+
+        #snowflake {
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100%);
+            }
+        }
+
+        @keyframes sway {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+        }
+
+        #buttons {
+            position: absolute;
+            top: 20px;
+            left: 20px;
         }
     </style>
 </head>
 <body>
-    <div id="game-board"></div>
-    
-    <div id="button-container">
-        <div class="arrow-button" id="left-button" onclick="moveBlockLeft()">&#9665;</div>
-        <div class="arrow-button" id="right-button" onclick="moveBlockRight()">&#9655;</div>
-        <div class="arrow-button" id="down-button" onclick="moveBlockDown()">&#9661;</div>
+    <div id="sky">
+        <div id="sun"></div>
+        <div id="cloud"></div>
+        <div id="raindrop"></div>
+        <div id="snowflake"></div>
     </div>
-    
+    <div id="buttons">
+        <button onclick="makeRain()">Rain</button>
+        <button onclick="makeSun()">Sun</button>
+        <button onclick="makeCloudy()">Cloudy</button>
+        <button onclick="makeSnow()">Snow</button>
+    </div>
     <script>
-        const gameBoard = document.getElementById('game-board');
-        let currentBlock;
-        let interval;
-        let maxY = 0; // 最下部を保持
-
-        function createBlock() {
-            const block = document.createElement('div');
-            block.classList.add('block');
-            block.style.width = '30px';
-            block.style.height = '30px';
-            block.style.position = 'absolute';
-            block.style.backgroundColor = getRandomColor();
-            const blockPosition = { x: Math.floor(Math.random() * 10) * 30, y: 0 };
-            block.style.left = blockPosition.x + 'px';
-            block.style.top = blockPosition.y + 'px';
-            gameBoard.appendChild(block);
-            return block;
+        function makeRain() {
+            const raindrop = document.createElement('div');
+            raindrop.classList.add('raindrop');
+            raindrop.style.left = `${Math.random() * window.innerWidth}px`;
+            document.getElementById('sky').appendChild(raindrop);
         }
 
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
+        function makeSun() {
+            const sun = document.getElementById('sun');
+            sun.style.transform = 'scale(1.5)';
         }
 
-        function moveBlockDown() {
-            if (!currentBlock) return;
-
-            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-            blockPosition.y += 30;
-            currentBlock.style.top = blockPosition.y + 'px';
-            maxY = Math.max(maxY, blockPosition.y); // 最下部を更新
-
-            if (maxY >= 570 || isBlockCollision()) {
-                currentBlock = null;
-                maxY = 0; // 最下部をリセット
-                checkAndClearLines();
-                currentBlock = createBlock();
-                interval = setInterval(moveBlockDown, 500);
-            }
+        function makeCloudy() {
+            const cloud = document.getElementById('cloud');
+            cloud.style.transform = 'scale(1.2)';
         }
 
-        function moveBlockLeft() {
-            if (!currentBlock) return;
-
-            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-            if (blockPosition.x > 0 && !isBlockCollision(-30, 0)) {
-                blockPosition.x -= 30;
-                currentBlock.style.left = blockPosition.x + 'px';
-            }
+        function makeSnow() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.style.left = `${Math.random() * window.innerWidth}px`;
+            document.getElementById('sky').appendChild(snowflake);
         }
-
-        function moveBlockRight() {
-            if (!currentBlock) return;
-
-            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-            if (blockPosition.x < 270 && !isBlockCollision(30, 0)) {
-                blockPosition.x += 30;
-                currentBlock.style.left = blockPosition.x + 'px';
-            }
-        }
-
-        function isBlockCollision(dx = 0, dy = 0) {
-            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-
-            const allBlocks = document.querySelectorAll('.block');
-            for (const block of allBlocks) {
-                if (block === currentBlock) continue;
-                const otherBlockPosition = { x: parseInt(block.style.left), y: parseInt(block.style.top) };
-                if (
-                    blockPosition.x + dx === otherBlockPosition.x &&
-                    blockPosition.y + dy === otherBlockPosition.y
-                ) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function checkAndClearLines() {
-            const allBlocks = document.querySelectorAll('.block');
-            for (let y = 570; y >= 0; y -= 30) {
-                const blocksInLine = Array.from(allBlocks).filter(block => parseInt(block.style.top) === y);
-                if (blocksInLine.length === 10) {
-                    for (const block of blocksInLine) {
-                        gameBoard.removeChild(block);
-                    }
-                    allBlocks.forEach(block => {
-                        if (parseInt(block.style.top) < y) {
-                            const newY = parseInt(block.style.top) + 30;
-                            block.style.top = newY + 'px';
-                        }
-                    });
-                }
-            }
-        }
-
-        // ページ読み込み時に初期ブロックを生成
-        window.onload = function() {
-            currentBlock = createBlock();
-            interval = setInterval(moveBlockDown, 500);
-        };
     </script>
 </body>
 </html>
-
