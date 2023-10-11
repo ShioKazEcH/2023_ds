@@ -44,6 +44,7 @@
     <script>
         const gameBoard = document.getElementById('game-board');
         let currentBlock;
+        let interval;
 
         function createBlock() {
             const block = document.createElement('div');
@@ -74,9 +75,13 @@
             const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
             blockPosition.y += 30;
             currentBlock.style.top = blockPosition.y + 'px';
-            if (blockPosition.y >= 570) {
-                gameBoard.removeChild(currentBlock);
+
+            if (blockPosition.y >= 570 || isBlockCollision()) {
+                clearInterval(interval);
+                currentBlock = null;
+                checkAndClearLines();
                 currentBlock = createBlock();
+                interval = setInterval(moveBlockDown, 500);
             }
         }
 
@@ -84,7 +89,7 @@
             if (!currentBlock) return;
 
             const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-            if (blockPosition.x > 0) {
+            if (blockPosition.x > 0 && !isBlockCollision(-30, 0)) {
                 blockPosition.x -= 30;
                 currentBlock.style.left = blockPosition.x + 'px';
             }
@@ -94,15 +99,51 @@
             if (!currentBlock) return;
 
             const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
-            if (blockPosition.x < 270) {
+            if (blockPosition.x < 270 && !isBlockCollision(30, 0)) {
                 blockPosition.x += 30;
                 currentBlock.style.left = blockPosition.x + 'px';
+            }
+        }
+
+        function isBlockCollision(dx = 0, dy = 0) {
+            const blockPosition = { x: parseInt(currentBlock.style.left), y: parseInt(currentBlock.style.top) };
+
+            const allBlocks = document.querySelectorAll('.block');
+            for (const block of allBlocks) {
+                if (block === currentBlock) continue;
+                const otherBlockPosition = { x: parseInt(block.style.left), y: parseInt(block.style.top) };
+                if (
+                    blockPosition.x + dx === otherBlockPosition.x &&
+                    blockPosition.y + dy === otherBlockPosition.y
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkAndClearLines() {
+            const allBlocks = document.querySelectorAll('.block');
+            for (let y = 570; y >= 0; y -= 30) {
+                const blocksInLine = Array.from(allBlocks).filter(block => parseInt(block.style.top) === y);
+                if (blocksInLine.length === 10) {
+                    for (const block of blocksInLine) {
+                        gameBoard.removeChild(block);
+                    }
+                    allBlocks.forEach(block => {
+                        if (parseInt(block.style.top) < y) {
+                            const newY = parseInt(block.style.top) + 30;
+                            block.style.top = newY + 'px';
+                        }
+                    });
+                }
             }
         }
 
         // ページ読み込み時に初期ブロックを生成
         window.onload = function() {
             currentBlock = createBlock();
+            interval = setInterval(moveBlockDown, 500);
         };
     </script>
 </body>
