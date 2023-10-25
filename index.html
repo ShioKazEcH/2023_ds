@@ -26,8 +26,8 @@
   var paddleX = (canvas.width - paddleWidth) / 2;
   var rightPressed = false;
   var leftPressed = false;
-  var brickRowCount = 3;
-  var brickColumnCount = 5;
+  var brickRowCount = 5;
+  var brickColumnCount = 8;
   var brickWidth = 75;
   var brickHeight = 20;
   var brickPadding = 10;
@@ -35,6 +35,8 @@
   var brickOffsetLeft = 30;
   var bricks = [];
   var score = 0;
+  var stage = 1;
+
   for (var c = 0; c < brickColumnCount; c++) {
       bricks[c] = [];
       for (var r = 0; r < brickRowCount; r++) {
@@ -71,7 +73,7 @@
                   bricks[c][r].y = brickY;
                   ctx.beginPath();
                   ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                  ctx.fillStyle = "#0095DD";
+                  ctx.fillStyle = stage === 1 ? "#0095DD" : "#FF5733";
                   ctx.fill();
                   ctx.closePath();
               }
@@ -105,8 +107,28 @@
                       b.status = 0;
                       score++;
                       if (score == brickRowCount * brickColumnCount) {
-                          alert("Congratulations, you cleared all the bricks!");
-                          document.location.reload();
+                          if (stage === 1) {
+                              stage = 2;
+                              brickRowCount = 6;
+                              brickColumnCount = 10;
+                              bricks = [];
+                              for (var c = 0; c < brickColumnCount; c++) {
+                                  bricks[c] = [];
+                                  for (var r = 0; r < brickRowCount; r++) {
+                                      bricks[c][r] = { x: 0, y: 0, status: 1 };
+                                  }
+                              }
+                              x = canvas.width / 2;
+                              y = canvas.height - 30;
+                              dx = 2;
+                              dy = -2;
+                              paddleX = (canvas.width - paddleWidth) / 2;
+                              score = 0;
+                              draw();
+                          } else {
+                              alert("Congratulations, you cleared all stages!");
+                              document.location.reload();
+                          }
                       }
                   }
               }
