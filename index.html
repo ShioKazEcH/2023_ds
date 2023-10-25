@@ -1,57 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>世界の銘菓オススメ</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    #recommendation {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      margin: 20px;
-      font-size: 24px;
-    }
-  </style>
+<style>
+  #stage {
+    width: 200px;
+    height: 400px;
+    border: 1px solid #000;
+    position: relative;
+  }
+  .block {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+  }
+</style>
 </head>
 <body>
-  <h1>世界の銘菓をオススメします</h1>
-  <div id="recommendation"></div>
 
-  <script>
-    // 世界の銘菓リスト
-    const worldFamousSweets = [
-      'ベルギーチョコレート',
-      'フランスのマカロン',
-      'イタリアのティラミス',
-      '日本の和菓子',
-      'トルコのバクラバ',
-      'スイスのスイスチョコレート',
-      'アメリカのアップルパイ',
-      'ギリシャのバクラバ',
-    ];
+<div id="stage"></div>
 
-    // ランダムに銘菓を選んで表示
-    function recommendSweet() {
-      const recommendationElement = document.getElementById('recommendation');
-      const randomIndex = Math.floor(Math.random() * worldFamousSweets.length);
-      const recommendedSweet = worldFamousSweets[randomIndex];
-      recommendationElement.textContent = `オススメの銘菓: ${recommendedSweet}`;
+<script>
+  let stage = document.getElementById("stage");
+
+  // グリッドのサイズ
+  let ROWS = 20;
+  let COLS = 10;
+  let board = [];
+  for (let r = 0; r < ROWS; r++) {
+    board[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      board[r][c] = 0;
     }
+  }
 
-    // ページ読み込み時に銘菓をオススメ
-    recommendSweet();
-  </script>
+  // テトリスブロック
+  let block = [
+    [1, 1, 1],
+    [0, 1, 0]
+  ];
+
+  let currentRow = 0;
+  let currentCol = 3;
+
+  function draw() {
+    let html = "";
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (board[r][c] === 1) {
+          html += '<div class="block" style="top: ' + (r * 20) + 'px; left: ' + (c * 20) + 'px; background-color: #f00;"></div>';
+        }
+      }
+    }
+    stage.innerHTML = html;
+  }
+
+  function merge() {
+    for (let r = 0; r < block.length; r++) {
+      for (let c = 0; c < block[r].length; c++) {
+        if (block[r][c] === 1) {
+          board[currentRow + r][currentCol + c] = 1;
+        }
+      }
+    }
+  }
+
+  function canMoveDown() {
+    for (let r = 0; r < block.length; r++) {
+      for (let c = 0; c < block[r].length; c++) {
+        if (block[r][c] === 1) {
+          if (currentRow + r === ROWS - 1) {
+            return false;
+          }
+          if (board[currentRow + r + 1][currentCol + c] === 1) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  function moveDown() {
+    if (canMoveDown()) {
+      currentRow++;
+    } else {
+      merge();
+      currentRow = 0;
+      currentCol = 3;
+    }
+    draw();
+  }
+
+  function moveLeft() {
+    if (currentCol > 0) {
+      currentCol--;
+      draw();
+    }
+  }
+
+  function moveRight() {
+    if (currentCol + block[0].length < COLS) {
+      currentCol++;
+      draw();
+    }
+  }
+
+  draw();
+  setInterval(moveDown, 1000);
+
+  document.onkeydown = function(e) {
+    switch (e.keyCode) {
+      case 37:
+        moveLeft();
+        break;
+      case 39:
+        moveRight();
+        break;
+    }
+  };
+</script>
+
 </body>
 </html>
