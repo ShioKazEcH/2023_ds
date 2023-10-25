@@ -2,122 +2,86 @@
 <html>
 <head>
 <style>
-  #stage {
+  #puzzle-board {
+    display: flex;
+    flex-wrap: wrap;
     width: 200px;
-    height: 400px;
-    border: 1px solid #000;
-    position: relative;
   }
-  .block {
-    width: 20px;
-    height: 20px;
-    position: absolute;
+
+  .puzzle-piece {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
   }
 </style>
 </head>
 <body>
 
-<div id="stage"></div>
+<div id="puzzle-board"></div>
 
 <script>
-  let stage = document.getElementById("stage");
+  let board = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  let puzzleBoard = document.getElementById('puzzle-board');
 
-  // グリッドのサイズ
-  let ROWS = 20;
-  let COLS = 10;
-  let board = [];
-  for (let r = 0; r < ROWS; r++) {
-    board[r] = [];
-    for (let c = 0; c < COLS; c++) {
-      board[r][c] = 0;
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function drawBoard() {
+    puzzleBoard.innerHTML = '';
+    for (let i = 0; i < board.length; i++) {
+      const puzzlePiece = document.createElement('div');
+      puzzlePiece.className = 'puzzle-piece';
+      puzzlePiece.innerText = board[i];
+      puzzlePiece.setAttribute('data-index', i);
+      puzzlePiece.addEventListener('click', handleMove);
+      puzzleBoard.appendChild(puzzlePiece);
     }
   }
 
-  // テトリスブロック
-  let block = [
-    [1, 1, 1],
-    [0, 1, 0]
-  ];
+  function handleMove(e) {
+    const clickedIndex = parseInt(e.target.getAttribute('data-index'));
+    const emptyIndex = board.indexOf(9);
 
-  let currentRow = 0;
-  let currentCol = 3;
-
-  function draw() {
-    let html = "";
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        if (board[r][c] === 1) {
-          html += '<div class="block" style="top: ' + (r * 20) + 'px; left: ' + (c * 20) + 'px; background-color: #f00;"></div>';
-        }
-      }
-    }
-    stage.innerHTML = html;
-  }
-
-  function merge() {
-    for (let r = 0; r < block.length; r++) {
-      for (let c = 0; c < block[r].length; c++) {
-        if (block[r][c] === 1) {
-          board[currentRow + r][currentCol + c] = 1;
-        }
+    if (isValidMove(clickedIndex, emptyIndex)) {
+      [board[clickedIndex], board[emptyIndex]] = [board[emptyIndex], board[clickedIndex]];
+      drawBoard();
+      if (isSolved()) {
+        alert('Congratulations! Puzzle solved!');
       }
     }
   }
 
-  function canMoveDown() {
-    for (let r = 0; r < block.length; r++) {
-      for (let c = 0; c < block[r].length; c++) {
-        if (block[r][c] === 1) {
-          if (currentRow + r === ROWS - 1) {
-            return false;
-          }
-          if (board[currentRow + r + 1][currentCol + c] === 1) {
-            return false;
-          }
-        }
+  function isValidMove(clickedIndex, emptyIndex) {
+    const validMoves = [emptyIndex - 3, emptyIndex + 3];
+    if (emptyIndex % 3 !== 0) {
+      validMoves.push(emptyIndex - 1);
+    }
+    if (emptyIndex % 3 !== 2) {
+      validMoves.push(emptyIndex + 1);
+    }
+    return validMoves.includes(clickedIndex);
+  }
+
+  function isSolved() {
+    for (let i = 0; i < board.length - 1; i++) {
+      if (board[i] !== i + 1) {
+        return false;
       }
     }
     return true;
   }
 
-  function moveDown() {
-    if (canMoveDown()) {
-      currentRow++;
-    } else {
-      merge();
-      currentRow = 0;
-      currentCol = 3;
-    }
-    draw();
-  }
-
-  function moveLeft() {
-    if (currentCol > 0) {
-      currentCol--;
-      draw();
-    }
-  }
-
-  function moveRight() {
-    if (currentCol + block[0].length < COLS) {
-      currentCol++;
-      draw();
-    }
-  }
-
-  draw();
-  setInterval(moveDown, 1000);
-
-  document.onkeydown = function(e) {
-    switch (e.keyCode) {
-      case 37:
-        moveLeft();
-        break;
-      case 39:
-        moveRight();
-        break;
-    }
-  };
+  board = shuffle(board);
+  drawBoard();
 </script>
 
 </body>
